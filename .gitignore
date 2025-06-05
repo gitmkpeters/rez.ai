@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+
+# Local environment variables
+.env
+
+# MacOS metadata
+.DS_Store
+
+# IDE/editor configs
+.vscode/
+*.code-workspace
+
+# Pytest / coverage / test logs
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Flask cache
+instance/
+*.db
+*.sqlite3
