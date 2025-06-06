@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>rez.ai – Upload Resume</title>
+</head>
+<body>
+    <h1>Upload Resume + Job Description</h1>
+    <form action="/generate" method="POST" enctype="multipart/form-data">
+        <label>Upload Resume (.txt):</label><br>
+        <input type="file" name="resume_file"><br><br>
+
+        <label>Paste Job Description:</label><br>
+        <textarea name="job_description" rows="10" cols="60"></textarea><br><br>
+
+        <button type="submit">Generate Tailored Resume</button>
+    </form>
+</body>
+</html>

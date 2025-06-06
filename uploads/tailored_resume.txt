@@ -1,0 +1,53 @@
+Simulated Tailored Resume
+=========================
+
+[Top Job Description Keywords]:
+sql, developer
+
+[Matched Resume Keywords]:
+sql, developer
+
+[Extracted Resume Sample]:
+ 
+720-544-1525 |
+jprflipside@gmail.com
+ 
+| 
+https://www.linkedin.com/in/mike-peterson-107293b/
+ 3357 Indian Grass St. Dacono, CO 80514
+  
+M
+ICHAEL
+ 
+P
+ETERSON
+                                                                              PL/SQL D
+EVELOPER 
+ Summary: Experienced SQL Developer with a strong background in enterprise financial systems, data integration, and audit 
+support.
+ 
+Skilled
+ 
+in
+ 
+writing
+ 
+and
+ 
+optimizing
+ 
+complex
+ 
+SQL
+ 
+and
+ 
+PL/SQL
+ 
+procedures,
+ 
+managing
+ 
+ETL
+ 
+proc
