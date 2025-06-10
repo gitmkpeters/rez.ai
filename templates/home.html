@@ -1,8 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head><title>rez.ai OAuth Test</title></head>
-<body>
-    <h1>rez.ai – LinkedIn Login</h1>
-    <a href="/login">Login with LinkedIn</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>Tailor Your Resume with AI</h1>
+    <p>Get a professionally tailored resume that matches job descriptions in seconds.</p>
+    <a href="{{ url_for('main.upload') }}" class="btn">Get Started</a>
+</div>
+
+<div class="features">
+    <div class="feature">
+        <h2>AI-Powered Tailoring</h2>
+        <p>Our advanced AI analyzes job descriptions and optimizes your resume to highlight relevant skills and experience.</p>
+    </div>
+    
+    <div class="feature">
+        <h2>URL Extraction</h2>
+        <p>Simply paste a job posting URL and we'll automatically extract the job description.</p>
+    </div>
+    
+    <div class="feature">
+        <h2>Professional PDFs</h2>
+        <p>Get a beautifully formatted PDF resume ready to submit to employers.</p>
+    </div>
+</div>
+{% endblock %}
