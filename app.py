@@ -1,22 +1,15 @@
-from flask import Flask, redirect, request, session, url_for, render_template, send_file
+from flask import Flask, redirect, request, session, render_template, send_file
 import os
 import requests
-import urllib.parse
 import docx
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfReader
-import openai
-import re
-from collections import Counter
-from fpdf import FPDF
+from openai import OpenAI
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import inch
 import html
-from jinja2 import Environment, FileSystemLoader
-
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
@@ -28,57 +21,19 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+# LinkedIn OAuth (only if you're using it)
 CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
 CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI")
 SIMULATED_MODE = os.getenv("SIMULATED_MODE", "true").lower() == "true"
+
+# OpenAI setup
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-# ✅ Move this after the OPENAI_API_KEY is defined
-from openai import OpenAI
 client = OpenAI(api_key=OPENAI_API_KEY)
-
-# Set OpenAI API key
-openai.api_key = OPENAI_API_KEY
 
 @app.route("/")
 def home():
     return render_template("home.html")
-
-@app.route("/login")
-def login():
-    encoded_redirect_uri = urllib.parse.quote(REDIRECT_URI, safe='')
-    auth_url = (
-        "https://www.linkedin.com/oauth/v2/authorization"
-        f"?response_type=code"
-        f"&client_id={CLIENT_ID}"
-        f"&redirect_uri={encoded_redirect_uri}"
-        f"&scope=r_liteprofile%20r_emailaddress%20w_member_social"
-    )
-    return redirect(auth_url)
-
-@app.route("/callback")
-def callback():
-    if SIMULATED_MODE:
-        session["access_token"] = "DUMMY_ACCESS_TOKEN_1234567890"
-        return "Simulated access token stored."
-    code = request.args.get("code")
-    token_url = "https://www.linkedin.com/oauth/v2/accessToken"
-    data = {
-        "grant_type": "authorization_code",
-        "code": code,
-        "redirect_uri": REDIRECT_URI,
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-    }
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(token_url, data=data, headers=headers)
-    token_json = response.json()
-    access_token = token_json.get("access_token")
-    if not access_token:
-        return f"OAuth failed: {token_json}", 400
-    session["access_token"] = access_token
-    return "Access token stored."
 
 @app.route("/upload")
 def upload():
@@ -163,6 +118,43 @@ def create_pdf_with_reportlab(text, output_path):
     
     doc.build(story)
     print(f"📄 PDF saved to {output_path}")
-    
+
+# LinkedIn OAuth routes (remove if not using)
+@app.route("/login")
+def login():
+    import urllib.parse  # Only import when needed
+    encoded_redirect_uri = urllib.parse.quote(REDIRECT_URI, safe='')
+    auth_url = (
+        "https://www.linkedin.com/oauth/v2/authorization"
+        f"?response_type=code"
+        f"&client_id={CLIENT_ID}"
+        f"&redirect_uri={encoded_redirect_uri}"
+        f"&scope=r_liteprofile%20r_emailaddress%20w_member_social"
+    )
+    return redirect(auth_url)
+
+@app.route("/callback")
+def callback():
+    if SIMULATED_MODE:
+        session["access_token"] = "DUMMY_ACCESS_TOKEN_1234567890"
+        return "Simulated access token stored."
+    code = request.args.get("code")
+    token_url = "https://www.linkedin.com/oauth/v2/accessToken"
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": REDIRECT_URI,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = requests.post(token_url, data=data, headers=headers)
+    token_json = response.json()
+    access_token = token_json.get("access_token")
+    if not access_token:
+        return f"OAuth failed: {token_json}", 400
+    session["access_token"] = access_token
+    return "Access token stored."
+
 if __name__ == "__main__":
     app.run(debug=True)
