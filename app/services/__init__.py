@@ -1,6 +1,6 @@
 """Services package for business logic."""
 
-from .web_scraper import WebScraperService
+from .web_scrapper import WebScraperService
 from .pdf_generator import PDFGeneratorService
 from .openai_service import OpenAIService
 
