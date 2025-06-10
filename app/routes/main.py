@@ -1,140 +1,79 @@
+# app/routes/main.py
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, current_app
 import os
-from flask import Blueprint, request, render_template, send_file, current_app, flash, redirect, url_for
+from datetime import datetime
+from app.services.resume_service import ResumeService
 from werkzeug.utils import secure_filename
 
-from app.services import WebScraperService, PDFGeneratorService, OpenAIService
-from app.utils.file_handlers import allowed_file, extract_text_from_file
-from app.utils.validations import validate_url, validate_file_size, sanitize_filename
+main = Blueprint('main', __name__)
+resume_service = ResumeService()
 
-# Create blueprint
-main_bp = Blueprint('main', __name__)
+@main.context_processor
+def inject_now():
+    return {'now': datetime.now()}
 
-# Initialize services
-web_scraper = WebScraperService()
-
-@main_bp.route("/")
+@main.route('/')
 def home():
-    """Home page."""
-    return render_template("home.html")
+    return render_template('home.html')
 
-@main_bp.route("/upload")
+@main.route('/upload')
 def upload():
-    """Upload page with form."""
-    return render_template("upload.html")
+    return render_template('upload.html')
 
-@main_bp.route("/generate", methods=["POST"])
-def generate():
-    """Generate tailored resume."""
-    try:
-        # Initialize services with current app config
-        pdf_service = PDFGeneratorService()
-        openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-        
-        # Get and validate resume file
-        resume_file = request.files.get("resume_file")
-        if not resume_file or resume_file.filename == '':
-            flash("Please select a resume file.", "error")
-            return redirect(url_for('main.upload'))
-        
-        # Validate file type
-        if not allowed_file(resume_file.filename, current_app.config['ALLOWED_EXTENSIONS']):
-            flash("Unsupported file type. Please upload PDF, DOCX, or TXT.", "error")
-            return redirect(url_for('main.upload'))
-        
-        # Validate file size
-        if not validate_file_size(resume_file):
-            flash("File too large. Maximum size is 16MB.", "error")
-            return redirect(url_for('main.upload'))
-        
-        # Handle job description input (text or URL)
-        input_type = request.form.get("input_type", "text")
-        job_description = ""
-        
-        if input_type == "text":
-            job_description = request.form.get("job_description", "").strip()
-            if not job_description:
-                flash("Please provide a job description.", "error")
-                return redirect(url_for('main.upload'))
-        else:  # URL input
-            job_url = request.form.get("job_url", "").strip()
-            if not job_url:
-                flash("Please provide a job URL.", "error")
-                return redirect(url_for('main.upload'))
-            
-            if not validate_url(job_url):
-                flash("Please provide a valid URL.", "error")
-                return redirect(url_for('main.upload'))
-            
-            # Extract job description from URL
-            job_description = web_scraper.extract_job_description_from_url(job_url)
-            if job_description.startswith("Error") or job_description.startswith("Could not extract"):
-                flash(f"URL Processing Error: {job_description}", "error")
-                return redirect(url_for('main.upload'))
-        
-        # Save and process resume file
-        filename = sanitize_filename(secure_filename(resume_file.filename))
-        resume_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        resume_file.save(resume_path)
-        
-        # Extract text from resume
-        resume_text = extract_text_from_file(resume_path)
-        if not resume_text.strip():
-            flash("Could not extract text from the resume file.", "error")
-            return redirect(url_for('main.upload'))
-        
-        # Generate tailored resume using OpenAI
-        success, result = openai_service.tailor_resume(resume_text, job_description)
-        if not success:
-            flash(f"Error generating tailored resume: {result}", "error")
-            return redirect(url_for('main.upload'))
-        
-        tailored_text = result
-        
-        # Generate PDF
-        pdf_path = os.path.join(current_app.config['UPLOAD_FOLDER'], "tailored_resume.pdf")
-        pdf_success, pdf_message = pdf_service.create_resume_pdf(tailored_text, pdf_path)
-        
-        if not pdf_success:
-            flash(f"Error creating PDF: {pdf_message}", "error")
-            return redirect(url_for('main.upload'))
-        
-        # Clean up uploaded file
-        try:
-            os.remove(resume_path)
-        except OSError:
-            pass  # File cleanup is not critical
-        
-        return send_file(pdf_path, as_attachment=True, download_name="tailored_resume.pdf")
-        
-    except Exception as e:
-        current_app.logger.error(f"Unexpected error in generate route: {str(e)}")
-        flash("An unexpected error occurred. Please try again.", "error")
-        return redirect(url_for('main.upload'))
-
-@main_bp.route("/about")
+@main.route('/about')
 def about():
-    """About page."""
-    return render_template("about.html")
+    return render_template('about.html')
 
-@main_bp.route("/health")
-def health_check():
-    """Health check endpoint for monitoring."""
-    return {"status": "healthy", "service": "rez.ai"}, 200
-
-# Error handlers for this blueprint
-@main_bp.errorhandler(413)
-def file_too_large(error):
-    """Handle file too large error."""
-    flash("File too large. Maximum size is 16MB.", "error")
-    return redirect(url_for('main.upload'))
-
-@main_bp.errorhandler(404)
-def not_found(error):
-    """Handle 404 errors."""
-    return render_template("errors/404.html"), 404
-
-@main_bp.errorhandler(500)
-def internal_error(error):
-    """Handle 500 errors."""
-    current_app.logger.error(f"Internal error: {str(error)}")
-    return render_template("errors/500.html"), 500
+@main.route('/generate', methods=['POST'])
+def generate():
+    if 'resume_file' not in request.files:
+        flash('No resume file uploaded', 'error')
+        return redirect(url_for('main.upload'))
+    
+    resume_file = request.files['resume_file']
+    
+    if resume_file.filename == '':
+        flash('No resume file selected', 'error')
+        return redirect(url_for('main.upload'))
+    
+    # Check file extension
+    allowed_extensions = {'pdf', 'docx', 'txt'}
+    if not '.' in resume_file.filename or resume_file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        flash('Invalid file type. Please upload a PDF, DOCX, or TXT file', 'error')
+        return redirect(url_for('main.upload'))
+    
+    # Get job description from form
+    input_type = request.form.get('input_type', 'text')
+    job_description = None
+    job_url = None
+    
+    if input_type == 'text':
+        job_description = request.form.get('job_description')
+        if not job_description:
+            flash('Please provide a job description', 'error')
+            return redirect(url_for('main.upload'))
+    else:  # input_type == 'url'
+        job_url = request.form.get('job_url')
+        if not job_url:
+            flash('Please provide a job URL', 'error')
+            return redirect(url_for('main.upload'))
+    
+    try:
+        # Process the resume
+        result = resume_service.process_resume(resume_file, job_description, job_url)
+        
+        # Return the PDF file
+        return send_file(
+            result['pdf_path'],
+            as_attachment=True,
+            download_name=result['filename'],
+            mimetype='application/pdf'
+        )
+    except ValueError as e:
+        flash(str(e), 'error')
+        return redirect(url_for('main.upload'))
+    except Exception as e:
+        current_app.logger.error(f"Error generating resume: {str(e)}")
+        flash('An error occurred while processing your resume. Please try again.', 'error')
+        return redirect(url_for('main.upload'))
