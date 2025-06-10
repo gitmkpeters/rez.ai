@@ -1,53 +1,43 @@
-Simulated Tailored Resume
-=========================
+MICHAEL PETERSON                                                                          
+Azure SQL Developer
+720-544-1525 |jprflipside@gmail.com |  https://www.linkedin.com/in/mike-peterson-107293b/
+3357 Indian Grass St. Dacono, CO 80514
 
-[Top Job Description Keywords]:
-sql, developer
+Summary: Accomplished SQL Developer with 7+ years of experience, specializing in designing and optimizing complex SQL and T-SQL procedures, managing ETL processes, and integrating data sources into SQL Server environments. Familiar with Azure Data Factory, Azure Synapse Analytics, and SQL Managed Instances. Skilled in Python and JavaScript for automation scripting. Proven track record of maintaining database performance, developing reports, and ensuring data accuracy across multi-server systems. 
 
-[Matched Resume Keywords]:
-sql, developer
+AREAS OF EXPERTISE 
+✔   Azure SQL Database ✔   T-SQL programming ✔   Python & JavaScript for Automation Scripting
+✔   Azure Data Factory & Synapse Analytics ✔   Service-oriented Architecture ✔   SQL Performance Tuning
+✔   Data Integration Tools ✔   Stored Procedures
 
-[Extracted Resume Sample]:
- 
-720-544-1525 |
-jprflipside@gmail.com
- 
-| 
-https://www.linkedin.com/in/mike-peterson-107293b/
- 3357 Indian Grass St. Dacono, CO 80514
-  
-M
-ICHAEL
- 
-P
-ETERSON
-                                                                              PL/SQL D
-EVELOPER 
- Summary: Experienced SQL Developer with a strong background in enterprise financial systems, data integration, and audit 
-support.
- 
-Skilled
- 
-in
- 
-writing
- 
-and
- 
-optimizing
- 
-complex
- 
-SQL
- 
-and
- 
-PL/SQL
- 
-procedures,
- 
-managing
- 
-ETL
- 
-proc
+PROFESSIONAL EXPERIENCE
+
+U.S. Small Business Administration (SBA) — Denver, CO / Hybrid
+Senior IT Specialist | Oct 2012 – Present
+• Designed and developed database solutions using SQL Server, improving operational reporting speed by 40%.
+• Optimized database performance through query tuning, indexing, and resource monitoring.
+• Utilized Python and JavaScript to automate backend data extraction for dashboards and audit reports — reducing manual effort and increasing data reliability.
+• Collaborated with data architects to ensure seamless data flow across systems.
+• Monitored, troubleshoot, and resolved issues related to SQL performance, reliability, and availability.
+• Supported backend analytics and reporting across enterprise systems, extracting data for performance optimization.
+• Designed backend workflows that mirror call center data tracking.
+• Created reusable reporting extracts that could integrate into systems like Salesforce.
+
+U.S. Small Business Administration – Financial Assurance Division
+Accountant • Denver, CO • 2004 – 2012
+• Led accounting operations and quality assurance efforts, ensuring compliance with federal financial regulations and SBA policy.
+• Conducted in-depth analysis of financial statements, SOPs, and general ledger data to ensure accuracy, data integrity, and compliance with audit standards.
+
+U.S. Small Business Administration – Programmatic Accounting Division
+Account Technician / Accountant (GS-07 to GS-11) • Denver, CO • 2000 – 2004
+• Managed transaction processing for disbursements, refunds, and account servicing, including manual and automated updates to the general ledger.
+
+EDUCATION
+Bachelor of Science, Computer Information Systems
+Metropolitan State University of Denver — 2014
+
+SKILLS
+✔   SQL & T-SQL Development ✔   Python & JavaScript Programming for Automation
+✔   Experience with Azure Data Factory & Synapse Analytics ✔   Familiarity with SQL Managed Instances
+✔   Database Optimization & Performance Tuning ✔   ETL Concepts & Data Pipeline Design
+✔   Data Analysis & Visualization ✔   Technical Leadership & System Integration
