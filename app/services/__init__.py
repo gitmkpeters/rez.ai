@@ -1,11 +1,10 @@
-"""Services package for business logic."""
+from app.services.scraper import JobScraper
+from app.services.document_service import DocumentService
+from app.services.resume_service import ResumeService
+from app.services.openai_service import OpenAIService
 
-from .web_scrapper import WebScraperService
-from .pdf_generator import PDFGeneratorService
-from .openai_service import OpenAIService
-
-__all__ = [
-    'WebScraperService',
-    'PDFGeneratorService', 
-    'OpenAIService'
-]
+# Create instances of services
+scraper = JobScraper()
+document_service = DocumentService()
+openai_service = OpenAIService()
+resume_service = ResumeService(scraper, document_service, openai_service)

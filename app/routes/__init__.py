@@ -1,6 +1,7 @@
-"""Routes package for Flask blueprints."""
+from flask import Blueprint
 
+main_bp = Blueprint('main', __name__)
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+# Import routes after Blueprint creation to avoid circular imports
 from .main import main_bp
-from .api import api_bp
-
-__all__ = ['main_bp', 'api_bp']

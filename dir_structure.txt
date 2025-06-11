@@ -1,0 +1,76 @@
+.
+├── LICENSE
+├── README.md
+├── app
+│   ├── __init__.py
+│   ├── output
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── api.py
+│   │   ├── api.py.backup
+│   │   └── main.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── document_service.py
+│   │   ├── openai_service.py
+│   │   ├── resume_service.py
+│   │   └── scraper.py
+│   ├── static
+│   │   ├── css
+│   │   │   └── styles.css
+│   │   ├── images
+│   │   └── js
+│   ├── templates
+│   │   ├── about.html
+│   │   ├── base.html
+│   │   ├── errors
+│   │   │   ├── 404.html
+│   │   │   └── 500.html
+│   │   ├── generate.html
+│   │   ├── generated_result.html
+│   │   ├── home.html
+│   │   ├── result.html
+│   │   ├── resume_template.html
+│   │   └── upload.html
+│   ├── uploads
+│   └── utils
+│       ├── __init__.py
+│       ├── file_handlers.py
+│       ├── validations.py
+│       └── validators.py
+├── app.py
+├── config.py
+├── debug_html
+│   ├── generic_debug.html
+│   └── linkedin_debug.html
+├── dir_structure.txt
+├── folder_structure.txt
+├── fonts
+│   └── DejaVuSans.ttf
+├── output
+│   └── tailored_Peterson_Resume.pdf
+├── requirements.txt
+├── run.py
+├── run_app.py
+├── run_http.py
+├── run_simple.py
+├── static
+│   ├── css
+│   ├── images
+│   └── js
+├── successful_httpbin_extraction.txt
+├── successful_linkedin_extraction.txt
+├── test_components.py
+├── test_imports.py
+├── test_real_job.py
+├── test_scraper.py
+├── test_urls.py
+├── tests
+│   └── __init__.py
+└── uploads
+    ├── Peterson_Resume.pdf
+    ├── Resume_SQL_Developer-_Mike_Peterson.pdf
+    ├── tailored_resume.pdf
+    └── tailored_resume.txt
+
+22 directories, 52 files

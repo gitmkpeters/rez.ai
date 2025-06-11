@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated {{ result.type|title }} - AI Resume Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .generated-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border: 1px solid #dee2e6;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        .copy-button {
+            margin-right: 10px;
+        }
+        .print-area {
+            display: none;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Generated {{ result.type|title }}</h2>
+                        <div>
+                            <a href="/generate" class="btn btn-outline-primary">Generate Another</a>
+                            <a href="/" class="btn btn-outline-secondary">Back to Analysis</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if result.success %}
+                            <div class="alert alert-success">
+                                <strong>✅ Success!</strong> {{ result.message }}
+                            </div>
+
+                            <!-- Generated Content -->
+                            <div class="generated-content" id="generated-content">
+                                {% if result.type == 'resume' %}
+                                    {{ result.generated_resume }}
+                                {% else %}
+                                    {{ result.generated_cover_letter }}
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button class="btn btn-primary copy-button" onclick="copyToClipboard()">
+                                    📋 Copy to Clipboard
+                                </button>
+                                <button class="btn btn-secondary" onclick="downloadAsText()">
+                                    💾 Download as Text
+                                </button>
+                                <button class="btn btn-info" onclick="printContent()">
+                                    🖨️ Print
+                                </button>
+                                {% if result.type == 'resume' %}
+                                <a href="/generate#cover-letter" class="btn btn-success">
+                                    ✍️ Generate Cover Letter
+                                </a>
+                                {% else %}
+                                <a href="/generate#resume" class="btn btn-success">
+                                    📄 Generate Resume
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- Job Description Preview -->
+                            {% if result.job_description %}
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Job Description Used</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 0.9rem;">
+                                        {{ result.job_description[:1000] }}{% if result.job_description|length > 1000 %}...{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <strong>❌ Error:</strong> {{ result.message }}
+                            </div>
+                            <div class="text-center">
+                                <a href="/generate" class="btn btn-primary">Try Again</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden print area -->
+    <div class="print-area">
+        <div id="print-content"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function copyToClipboard() {
+            const content = document.getElementById('generated-content').innerText;
+            navigator.clipboard.writeText(content).then(function() {
+                // Show success message
+                const button = document.querySelector('.copy-button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-primary');
+                
+                setTimeout(function() {
+                    button.innerHTML = originalText;
+                    button.classList.add('btn-primary');
+                    button.classList.remove('btn-success');
+                }, 2000);
+            }).catch(function(err) {
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function downloadAsText() {
+            const content = document.getElementById('generated-content').innerText;
+            const type = '{{ result.type }}';
+            const filename = `generated_${type}_${new Date().toISOString().split('T')[0]}.txt`;
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function printContent() {
+            const content = document.getElementById('generated-content').innerHTML;
+            document.getElementById('print-content').innerHTML = content;
+            window.print();
+        }
+    </script>
+</body>
+</html>
