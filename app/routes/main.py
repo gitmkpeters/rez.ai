@@ -1,20 +1,18 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from app.services import resume_service
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file
 import logging
 import os
 
 main_bp = Blueprint('main', __name__)
 logger = logging.getLogger(__name__)
 
-@main_bp.route('/test-env', methods=['GET'])
-def test_env():
-    """Test route to check if environment variables are loaded"""
-    api_key = os.getenv('OPENAI_API_KEY')
-    return jsonify({
-        'api_key_exists': bool(api_key),
-        'api_key_length': len(api_key) if api_key else 0,
-        'api_key_prefix': api_key[:10] + '...' if api_key else 'None'
-    })
+# Import resume_service with error handling
+try:
+    from app.services import resume_service
+    if resume_service is None:
+        logger.error("resume_service is None after import")
+except Exception as e:
+    logger.error(f"Failed to import resume_service: {str(e)}")
+    resume_service = None
 
 @main_bp.route('/', methods=['GET'])
 def index():
@@ -27,6 +25,11 @@ def generate():
 @main_bp.route('/generate-resume', methods=['POST'])
 def generate_resume():
     try:
+        # Check if resume_service is available
+        if resume_service is None:
+            flash('Resume generation service is not available. Please check your configuration.', 'error')
+            return redirect(url_for('main.generate'))
+        
         # Collect user information
         user_info = {
             'full_name': request.form.get('full_name', '').strip(),
@@ -99,6 +102,11 @@ def generate_resume():
 @main_bp.route('/generate-cover-letter', methods=['POST'])
 def generate_cover_letter():
     try:
+        # Check if resume_service is available
+        if resume_service is None:
+            flash('Cover letter generation service is not available. Please check your configuration.', 'error')
+            return redirect(url_for('main.generate'))
+        
         # Collect user information
         user_info = {
             'full_name': request.form.get('full_name', '').strip(),
@@ -158,9 +166,127 @@ def generate_cover_letter():
         flash(f'An unexpected error occurred: {str(e)}', 'error')
         return redirect(url_for('main.generate'))
 
+@main_bp.route('/analyze-resume', methods=['POST'])
+def analyze_resume():
+    """Analyze a generated resume for quality"""
+    try:
+        if resume_service is None:
+            return jsonify({
+                "success": False,
+                "message": "Resume analysis service is not available"
+            })
+        
+        data = request.get_json()
+        resume_content = data.get('resume_content', '')
+        job_description = data.get('job_description', '')
+        
+        if not resume_content or not job_description:
+            return jsonify({
+                "success": False,
+                "message": "Resume content and job description are required"
+            })
+        
+        # Analyze the resume
+        result = resume_service.analyze_generated_resume(resume_content, job_description)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Error analyzing resume: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error analyzing resume: {str(e)}"
+        })
+
+@main_bp.route('/download-pdf/<filename>')
+def download_pdf(filename):
+    """Download generated files with robust path handling - FIXED VERSION"""
+    try:
+        logger.info(f"Download request for file: {filename}")
+        
+        # List of possible directories to check (in order of preference)
+        possible_paths = [
+            os.path.join('app/output', filename),      # PDF files location
+            os.path.join('output', filename),          # Text files location
+            os.path.join('app/static/output', filename),
+            os.path.join('.', filename),               # Current directory
+            filename                                   # Just filename
+        ]
+        
+        # Try each possible location
+        for file_path in possible_paths:
+            if os.path.exists(file_path):
+                logger.info(f"✅ File found at: {file_path}")
+                file_size = os.path.getsize(file_path)
+                logger.info(f"File size: {file_size} bytes")
+                
+                # Determine the correct mimetype
+                if filename.endswith('.pdf'):
+                    mimetype = 'application/pdf'
+                elif filename.endswith('.txt'):
+                    mimetype = 'text/plain'
+                else:
+                    mimetype = 'application/octet-stream'
+                
+                logger.info(f"Serving file with mimetype: {mimetype}")
+                return send_file(file_path, as_attachment=True, mimetype=mimetype)
+        
+        # If file not found in any location, list what files we do have
+        logger.error(f"❌ File not found: {filename}")
+        
+        # Debug: List files in all directories
+        for directory in ['output', 'app/output', 'app/static/output']:
+            if os.path.exists(directory):
+                files = os.listdir(directory)
+                logger.info(f"Files in {directory}: {files}")
+            else:
+                logger.info(f"Directory {directory} does not exist")
+        
+        flash(f'File "{filename}" not found. It may have been moved or deleted.', 'error')
+        return redirect(url_for('main.index'))
+        
+    except Exception as e:
+        logger.error(f"❌ Error downloading file: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        flash(f'Error downloading file: {str(e)}', 'error')
+        return redirect(url_for('main.index'))
+
+@main_bp.route('/list-files')
+def list_files():
+    """Debug route to list all available files"""
+    try:
+        file_info = {}
+        directories = ['output', 'app/output', 'app/static/output']
+        
+        for directory in directories:
+            if os.path.exists(directory):
+                files = []
+                for filename in os.listdir(directory):
+                    file_path = os.path.join(directory, filename)
+                    if os.path.isfile(file_path):
+                        size = os.path.getsize(file_path)
+                        files.append({
+                            'name': filename,
+                            'size': size,
+                            'path': file_path
+                        })
+                file_info[directory] = files
+            else:
+                file_info[directory] = "Directory does not exist"
+        
+        return jsonify(file_info)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 @main_bp.route('/process', methods=['POST'])
 def process():
     try:
+        if resume_service is None:
+            flash('Resume processing service is not available. Please check your configuration.', 'error')
+            return redirect(url_for('main.index'))
+        
         # Get form data
         job_description = request.form.get('job_description', '').strip()
         job_url = request.form.get('job_url', '').strip()
@@ -214,6 +340,9 @@ def process():
 def test_url():
     """AJAX endpoint to test URL extraction"""
     try:
+        if resume_service is None:
+            return jsonify({"success": False, "message": "URL testing service is not available"})
+        
         data = request.get_json()
         url = data.get('url', '').strip()
         

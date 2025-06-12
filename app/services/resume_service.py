@@ -3,11 +3,19 @@ from werkzeug.utils import secure_filename
 import re
 
 class ResumeService:
-    def __init__(self, scraper, document_service, openai_service=None):
+    def __init__(self, scraper, document_service, openai_service=None, pdf_service=None):
+        """Initialize ResumeService with required dependencies"""
         self.scraper = scraper
         self.document_service = document_service
         self.openai_service = openai_service
+        self.pdf_service = pdf_service
         self.logger = logging.getLogger(__name__)
+        
+        # Log initialization
+        self.logger.info(f"ResumeService initialized with scraper={scraper is not None}, "
+                        f"document_service={document_service is not None}, "
+                        f"openai_service={openai_service is not None}, "
+                        f"pdf_service={pdf_service is not None}")
 
     def process_job_url(self, url):
         """Process a job URL with intelligent fallbacks and URL fixing"""
@@ -133,14 +141,11 @@ class ResumeService:
             }
 
     def _analyze_resume_vs_job(self, resume_text, job_description):
-        """Analyze resume against job description (placeholder for now)"""
-        # TODO: Add your AI/ML analysis logic here
-        # For now, return basic statistics
-        
+        """Analyze resume against job description"""
         resume_words = len(resume_text.split())
         job_words = len(job_description.split())
         
-        # Simple keyword matching (you can enhance this)
+        # Simple keyword matching
         job_keywords = self._extract_keywords(job_description)
         resume_keywords = self._extract_keywords(resume_text)
         
@@ -156,7 +161,7 @@ class ResumeService:
         }
 
     def _extract_keywords(self, text):
-        """Extract keywords from text (simple implementation)"""
+        """Extract keywords from text"""
         # Convert to lowercase and split
         words = text.lower().split()
         
@@ -177,7 +182,10 @@ class ResumeService:
     def generate_tailored_resume(self, user_info, job_description=None, job_url=None):
         """Generate a new resume from scratch using AI"""
         try:
+            self.logger.info("Starting resume generation process")
+            
             # Get job description from URL if provided
+            url_result = None
             if job_url and not job_description:
                 url_result = self.process_job_url(job_url)
                 if url_result["success"]:
@@ -200,14 +208,32 @@ class ResumeService:
                     "message": "OpenAI service not available. Please check your API key."
                 }
             
+            # Extract user name for file naming
+            user_name = self._extract_user_name(user_info)
+            
             # Generate resume using AI
             generated_resume = self.openai_service.generate_resume(user_info, job_description)
+            
+            # Generate PDF of the resume
+            pdf_result = None
+            if self.pdf_service:
+                pdf_result = self.pdf_service.generate_resume_pdf(generated_resume, user_name)
+            
+            # Automatically generate cover letter
+            cover_letter_result = self.generate_cover_letter(
+                user_info=user_info,
+                job_description=job_description,
+                company_name=self._extract_company_name(job_description)
+            )
             
             return {
                 "success": True,
                 "generated_resume": generated_resume,
                 "job_description": job_description,
-                "message": "Resume generated successfully!"
+                "message": "Resume generated successfully!",
+                "pdf_result": pdf_result,
+                "cover_letter_result": cover_letter_result,
+                "user_name": user_name
             }
             
         except Exception as e:
@@ -243,16 +269,26 @@ class ResumeService:
                     "message": "OpenAI service not available. Please check your API key."
                 }
             
+            # Extract user name for file naming
+            user_name = self._extract_user_name(user_info)
+            
             # Generate cover letter using AI
             generated_cover_letter = self.openai_service.generate_cover_letter(
                 user_info, job_description, company_name
             )
             
+            # Generate PDF of the cover letter
+            pdf_result = None
+            if self.pdf_service:
+                pdf_result = self.pdf_service.generate_cover_letter_pdf(generated_cover_letter, user_name)
+            
             return {
                 "success": True,
                 "generated_cover_letter": generated_cover_letter,
                 "job_description": job_description,
-                "message": "Cover letter generated successfully!"
+                "message": "Cover letter generated successfully!",
+                "pdf_result": pdf_result,
+                "user_name": user_name
             }
             
         except Exception as e:
@@ -261,3 +297,58 @@ class ResumeService:
                 "success": False,
                 "message": f"Error generating cover letter: {str(e)}"
             }
+
+    def analyze_generated_resume(self, resume_content, job_description):
+        """Analyze the quality of a generated resume against the job description"""
+        try:
+            if not self.openai_service:
+                return {
+                    "success": False,
+                    "message": "OpenAI service not available. Please check your API key."
+                }
+            
+            # Use OpenAI to analyze the resume
+            analysis = self.openai_service.analyze_resume_fit(resume_content, job_description)
+            
+            # Also do basic keyword analysis
+            basic_analysis = self._analyze_resume_vs_job(resume_content, job_description)
+            
+            return {
+                "success": True,
+                "ai_analysis": analysis,
+                "keyword_analysis": basic_analysis,
+                "message": "Resume analysis completed successfully!"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error analyzing generated resume: {str(e)}")
+            return {
+                "success": False,
+                "message": f"Error analyzing resume: {str(e)}"
+            }
+
+    def _extract_user_name(self, user_info):
+        """Extract user name from user info for file naming"""
+        # Look for name in the user_info string
+        lines = user_info.split('\n')
+        for line in lines:
+            if 'Name:' in line:
+                return line.replace('Name:', '').strip()
+        
+        # Fallback to first line or default
+        first_line = lines[0].strip() if lines else "User"
+        return first_line.replace('Name:', '').strip() or "User"
+
+    def _extract_company_name(self, job_description):
+        """Try to extract company name from job description"""
+        # Simple extraction - look for common patterns
+        lines = job_description.split('\n')[:10]  # Check first 10 lines
+        
+        for line in lines:
+            # Look for patterns like "Company: XYZ" or "XYZ is looking for"
+            if 'company:' in line.lower():
+                return line.split(':')[1].strip()
+            elif 'is looking for' in line.lower():
+                return line.split('is looking for')[0].strip()
+        
+        return None
