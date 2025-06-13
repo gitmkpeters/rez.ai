@@ -206,8 +206,8 @@ def download_pdf(filename):
         
         # List of possible directories to check (in order of preference)
         possible_paths = [
-            os.path.join('app/output', filename),      # PDF files location
-            os.path.join('output', filename),          # Text files location
+            os.path.join('output', filename),          # Main output directory
+            os.path.join('app/output', filename),      # App output directory
             os.path.join('app/static/output', filename),
             os.path.join('.', filename),               # Current directory
             filename                                   # Just filename
@@ -229,7 +229,11 @@ def download_pdf(filename):
                     mimetype = 'application/octet-stream'
                 
                 logger.info(f"Serving file with mimetype: {mimetype}")
-                return send_file(file_path, as_attachment=True, mimetype=mimetype)
+                
+                # Use the absolute path with os.path.abspath
+                abs_path = os.path.abspath(file_path)
+                logger.info(f"Serving absolute path: {abs_path}")
+                return send_file(abs_path, as_attachment=True, mimetype=mimetype)
         
         # If file not found in any location, list what files we do have
         logger.error(f"❌ File not found: {filename}")

@@ -14,7 +14,7 @@ class PDFService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         
-    def generate_resume_pdf(self, resume_content, user_name="Resume", output_dir="app/output"):
+    def generate_resume_pdf(self, resume_content, user_name="Resume", output_dir="output"):
         """Generate a well-formatted PDF from resume content with smart placeholder filtering"""
         try:
             self.logger.info(f"Starting smart PDF generation for resume: {user_name}")
@@ -98,7 +98,7 @@ class PDFService:
                 "message": f"Error generating PDF: {str(e)}"
             }
     
-    def generate_cover_letter_pdf(self, cover_letter_content, user_name="Cover_Letter", output_dir="app/output"):
+    def generate_cover_letter_pdf(self, cover_letter_content, user_name="Cover_Letter", output_dir="output"):
         """Generate a well-formatted cover letter PDF with minimal placeholder removal"""
         try:
             self.logger.info(f"Starting cover letter PDF generation for: {user_name}")

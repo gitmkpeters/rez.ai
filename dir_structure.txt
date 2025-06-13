@@ -5,6 +5,8 @@
 ├── app
 │   ├── __init__.py
 │   ├── output
+│   │   ├── Mike_Peterson_Cover_Letter_20250612_105158.pdf
+│   │   └── Mike_Peterson_Resume_20250612_105153.pdf
 │   ├── routes
 │   │   ├── __init__.py
 │   │   ├── api.py
@@ -14,8 +16,13 @@
 │   │   ├── debug_service.py
 │   │   ├── document_service.py
 │   │   ├── openai_service.py
+│   │   ├── openai_service.py.20250612_164356.bak
+│   │   ├── openai_service.py.20250612_164925.bak
+│   │   ├── openai_service.py.bak_20250612_183751
 │   │   ├── pdf_service.py
 │   │   ├── resume_service.py
+│   │   ├── resume_service.py.20250612_164356.bak
+│   │   ├── resume_service.py.20250612_164925.bak
 │   │   ├── scraper.py
 │   │   └── simple_pdf_service.py
 │   ├── static
@@ -42,22 +49,67 @@
 │       ├── file_handlers.py
 │       ├── validations.py
 │       └── validators.py
+├── ats_test.log
+├── ats_test_output
+│   ├── ats_report_20250613_081156.html
+│   ├── summary_analysis_20250613_075408.json
+│   ├── summary_analysis_20250613_081156.json
+│   ├── tailored_summary_20250613_075333.txt
+│   ├── tailored_summary_20250613_075408.txt
+│   ├── tailored_summary_20250613_081156.txt
+│   ├── visualizations_20250613_075408
+│   │   ├── matching_keywords.png
+│   │   ├── overall_score.png
+│   │   └── score_components.png
+│   └── visualizations_20250613_081156
+│       ├── matching_keywords.png
+│       ├── overall_score.png
+│       └── score_components.png
+├── cert.pem
+├── check_app_status.py
+├── cleanup_project_files.py
+├── commit_changes.sh
 ├── config.py
 ├── debug_html
 │   ├── generic_debug.html
 │   └── linkedin_debug.html
 ├── dir_structure.txt
+├── direct_ats_test.py
+├── direct_fix.py
+├── direct_fix_openai_service.py
+├── fix_download_path.py
+├── fix_filepath_issue.py
+├── fix_ssl_issue.py
+├── fixed_direct_fix.py
 ├── fonts
 │   └── DejaVuSans.ttf
+├── install_dependencies.py
+├── key.pem
+├── one_step_ats_fix.py
 ├── output
-│   └── John_Doe_Resume_20250611_171309.txt
+│   ├── John_Doe_Resume_20250611_171309.txt
+│   ├── Mike_Peterson_Cover_Letter_20250612_110226.pdf
+│   ├── Mike_Peterson_Cover_Letter_20250612_160537.pdf
+│   ├── Mike_Peterson_Cover_Letter_20250613_084539.pdf
+│   ├── Mike_Peterson_Resume_20250612_110221.pdf
+│   ├── Mike_Peterson_Resume_20250612_160532.pdf
+│   └── Mike_Peterson_Resume_20250613_084506.pdf
+├── python manual_fix_instructions.py
 ├── requirements.txt
 ├── run.py
+├── run_http_only.py
 ├── run_simple.py
-├── setup_direstories.py
-├── test_simple_pdf.py
+├── run_simple_fixed.py
+├── simple_test_summary.py
+├── start_app.sh
+├── test_ats_optimization.py
+├── test_file_generation.py
+├── test_summary.py
+├── test_summary_simple.py
+├── test_tailored_summary.py
 ├── tests
 │   └── __init__.py
+├── update_openai_service.py
 └── uploads
 
-19 directories, 42 files
+22 directories, 91 files

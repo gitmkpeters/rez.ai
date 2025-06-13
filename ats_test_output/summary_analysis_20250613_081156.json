@@ -1,0 +1,71 @@
+{
+  "summary_text": "Senior Software Engineer with over 5 years of experience specializing in Python and web development. Proficient in React, Node.js, and AWS, with a proven track record of designing, developing, and maintaining web applications. Increased application performance by 40% and reduced deployment time by 60% through the implementation of CI/CD pipelines. Excels in cross-functional collaboration and mentoring junior developers. Looking forward to contributing to innovative solutions and optimizing applications for maximum speed and scalability.",
+  "summary_length": 542,
+  "word_count": 73,
+  "is_optimal_length": false,
+  "keyword_match_percentage": 22.22222222222222,
+  "semantic_similarity": 40.68618328676355,
+  "quantified_achievements": [
+    "40",
+    "60",
+    "5"
+  ],
+  "top_job_keywords": {
+    "experience": 6,
+    "development": 4,
+    "applications": 4,
+    "software": 3,
+    "web": 3,
+    "senior": 2,
+    "engineer": 2,
+    "years": 2,
+    "python": 2,
+    "react": 2,
+    "nodejs": 2,
+    "cloud": 2,
+    "technologies": 2,
+    "aws": 2,
+    "crossfunctional": 2
+  },
+  "top_summary_keywords": {
+    "web": 2,
+    "applications": 2,
+    "senior": 1,
+    "software": 1,
+    "engineer": 1,
+    "years": 1,
+    "experience": 1,
+    "specializing": 1,
+    "python": 1,
+    "development": 1,
+    "proficient": 1,
+    "react": 1,
+    "nodejs": 1,
+    "aws": 1,
+    "proven": 1
+  },
+  "top_matching_keywords": {
+    "web": 2,
+    "applications": 2,
+    "senior": 1,
+    "software": 1,
+    "engineer": 1,
+    "looking": 1,
+    "years": 1,
+    "experience": 1,
+    "python": 1,
+    "development": 1,
+    "react": 1,
+    "nodejs": 1,
+    "aws": 1,
+    "designing": 1,
+    "developing": 1
+  },
+  "overall_ats_score": 31.470569990686045,
+  "score_components": {
+    "keyword_score": 13.333333333333332,
+    "semantic_score": 8.13723665735271,
+    "quantified_score": 10,
+    "length_score": 0
+  }
+}

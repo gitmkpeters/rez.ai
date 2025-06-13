@@ -146,7 +146,7 @@ class OpenAIService:
             )
             
             return response.choices[0].message.content.strip()
-        
+            
         except Exception as e:
             self.logger.error(f"Error tailoring resume with OpenAI: {str(e)}")
             raise ValueError(f"Error processing resume with AI: {str(e)}")
@@ -308,3 +308,59 @@ class OpenAIService:
         except Exception as e:
             self.logger.error(f"Error analyzing resume fit with OpenAI: {str(e)}")
             raise ValueError(f"Error analyzing resume with AI: {str(e)}")
+
+def generate_tailored_summary(self, work_experience, job_description, user_skills=None):
+    """Generate a highly tailored professional summary optimized for ATS and job matching"""
+    try:
+        # Extract key information for better targeting
+        skills_text = f"\n\nKey Skills: {user_skills}" if user_skills else ""
+        
+        prompt = f"""
+        You are an expert ATS optimization specialist and resume writer. Create a powerful, tailored professional summary that will achieve the HIGHEST possible match score with the job description.
+
+        JOB DESCRIPTION TO MATCH:
+        {job_description}
+
+        USER'S WORK EXPERIENCE:
+        {work_experience}{skills_text}
+
+        Create a professional summary (3-4 sentences, 80-120 words) that:
+
+        1. **KEYWORD OPTIMIZATION**: Include the EXACT keywords and phrases from the job description
+        2. **QUANTIFIED ACHIEVEMENTS**: Use specific numbers, percentages, or metrics from the user's experience
+        3. **ROLE ALIGNMENT**: Mirror the job title and key responsibilities mentioned in the posting
+        4. **INDUSTRY LANGUAGE**: Use the same terminology and buzzwords as the job description
+        5. **VALUE PROPOSITION**: Clearly state how the candidate solves the employer's specific needs
+        6. **ATS FRIENDLY**: Use standard formatting and avoid special characters
+
+        REQUIREMENTS:
+        - Start with the candidate's years of experience and primary expertise area
+        - Include 3-5 key skills/technologies mentioned in the job posting
+        - Mention 1-2 quantified achievements that align with job requirements
+        - End with a forward-looking statement about contributing to the company's goals
+        - Use action verbs that match the job description's language
+        - Ensure every word adds value for ATS scanning
+
+        Return ONLY the professional summary text, no additional formatting or explanations.
+        """
+        
+        response = self.client.chat.completions.create(
+            model="gpt-4",  # Using GPT-4 for better quality
+            messages=[
+                {"role": "system", "content": "You are an expert ATS optimization specialist who creates professional summaries that achieve maximum job match scores."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=300,
+            temperature=0.3  # Lower temperature for more focused, consistent output
+        )
+        
+        summary = response.choices[0].message.content.strip()
+        
+        # Log for debugging
+        self.logger.info(f"Generated tailored summary: {len(summary)} characters")
+        
+        return summary
+        
+    except Exception as e:
+        self.logger.error(f"Error generating tailored summary: {str(e)}")
+        raise ValueError(f"Error generating tailored summary: {str(e)}")
