@@ -1,4 +1,37 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""
+Rollback Script - Restore to Working State
+==========================================
+This script restores the application to the working state before template issues.
+"""
+
+import os
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+def create_file(file_path, content):
+    """Create a file with the given content"""
+    try:
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        logger.info(f"✅ Restored: {file_path}")
+        return True
+    except Exception as e:
+        logger.error(f"❌ Failed to restore {file_path}: {str(e)}")
+        return False
+
+def main():
+    print("🔄 Rolling back to working state...")
+    print("=" * 50)
+    
+    # Restore original upload.html with working analyze/generate functionality
+    upload_html = '''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -259,4 +292,107 @@
     }
 </script>
 </body>
-</html>
+</html>'''
+
+    # Restore base.html template for profile system
+    base_html = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Resume Tailor{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .nav-bar {
+            background-color: #fff;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #495057;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav-links a:hover {
+            background-color: #e9ecef;
+            text-decoration: none;
+            color: #495057;
+        }
+        .nav-links .active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="/" class="text-xl font-bold">Resume Tailor</a>
+            <div class="space-x-2">
+                <a href="/">Home</a>
+                <a href="/generate">Generate</a>
+                <a href="/profile">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="alert mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% else %}bg-green-100 text-green-700 border border-green-300{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p class="text-center text-gray-500">&copy; 2025 Resume Tailor. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>'''
+
+    # Files to restore
+    files_to_restore = [
+        ('app/templates/upload.html', upload_html),
+        ('app/templates/base.html', base_html),
+    ]
+    
+    success_count = 0
+    for file_path, content in files_to_restore:
+        if create_file(file_path, content):
+            success_count += 1
+    
+    print(f"\n🎉 Rollback complete!")
+    print(f"✅ Restored {success_count}/{len(files_to_restore)} files")
+    print("\nNext steps:")
+    print("1. Restart your Flask app: python run_http_only.py")
+    print("2. Test the main page functionality")
+    print("3. Test the profile system")
+
+if __name__ == "__main__":
+    main()

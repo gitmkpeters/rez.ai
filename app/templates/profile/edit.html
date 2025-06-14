@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">
+                {% if profile %}Edit Profile{% else %}Create Profile{% endif %}
+            </h1>
+            
+            <form method="POST" action="{{ url_for('profile.save_profile') }}">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                
+                <!-- Basic Information -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name *</label>
+                        <input type="text" id="full_name" name="full_name" required
+                               value="{{ profile.full_name if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email *</label>
+                        <input type="email" id="email" name="email" required
+                               value="{{ profile.email if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" id="phone" name="phone"
+                               value="{{ profile.phone if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                        <input type="text" id="location" name="location"
+                               value="{{ profile.location if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="linkedin" class="block text-sm font-medium text-gray-700">LinkedIn URL</label>
+                        <input type="url" id="linkedin" name="linkedin"
+                               value="{{ profile.linkedin if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+                        <input type="url" id="website" name="website"
+                               value="{{ profile.website if profile else '' }}"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="summary" class="block text-sm font-medium text-gray-700">Professional Summary</label>
+                        <textarea id="summary" name="summary" rows="4"
+                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ profile.summary if profile else '' }}</textarea>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="mt-6 flex justify-between">
+                    <a href="{{ url_for('profile.profile_home', user_id=user_id) }}" 
+                       class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

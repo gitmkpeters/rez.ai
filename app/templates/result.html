@@ -3,169 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Analysis Results</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Resume Tailor - Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 1200px;
-        }
-        .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .keyword-badge {
-            margin: 2px;
-        }
-        .match-percentage {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-        .text-preview {
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 0.9rem;
-        }
-    </style>
+    body {
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+    .container {
+        max-width: 1200px;
+    }
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .keyword-badge {
+        margin: 2px;
+    }
+    .match-percentage {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    .text-preview {
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+</style>
 </head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">Resume Analysis Results</h2>
-                        <a href="/" class="btn btn-outline-primary">Analyze Another</a>
-                    </div>
-                    <div class="card-body">
-                        {% if result.success %}
-                            <!-- URL Extraction Info -->
-                            {% if result.url_result %}
-                            <div class="alert alert-success">
-                                <strong>✅ URL Extraction Successful!</strong> 
-                                Extracted {{ result.url_result.extraction_length }} characters from job posting.
-                            </div>
-                            {% endif %}
+<body class="bg-gray-100">
 
-                            <!-- Match Overview -->
-                            <div class="row mb-4">
-                                <div class="col-md-4 text-center">
-                                    <div class="card bg-primary text-white">
-                                        <div class="card-body">
-                                            <div class="match-percentage">{{ "%.1f"|format(result.analysis.match_percentage) }}%</div>
-                                            <p class="mb-0">Keyword Match</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <div class="card bg-info text-white">
-                                        <div class="card-body">
-                                            <div class="match-percentage">{{ result.analysis.resume_word_count }}</div>
-                                            <p class="mb-0">Resume Words</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-center">
-                                    <div class="card bg-success text-white">
-                                        <div class="card-body">
-                                            <div class="match-percentage">{{ result.analysis.job_word_count }}</div>
-                                            <p class="mb-0">Job Description Words</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Keywords Analysis -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 class="mb-0">Job Keywords</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            {% for keyword in result.analysis.job_keywords %}
-                                                <span class="badge badge-primary keyword-badge">{{ keyword }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 class="mb-0">Resume Keywords</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            {% for keyword in result.analysis.resume_keywords %}
-                                                <span class="badge badge-info keyword-badge">{{ keyword }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Matching Keywords -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Matching Keywords ({{ result.analysis.matching_keywords|length }})</h5>
-                                </div>
-                                <div class="card-body">
-                                    {% if result.analysis.matching_keywords %}
-                                        {% for keyword in result.analysis.matching_keywords %}
-                                            <span class="badge badge-success keyword-badge">{{ keyword }}</span>
-                                        {% endfor %}
-                                    {% else %}
-                                        <p class="text-muted">No matching keywords found. Consider adding relevant skills and terms from the job description to your resume.</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Content Previews -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Resume Preview</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="text-preview">
-                                                {{ result.resume_text[:500] }}{% if result.resume_text|length > 500 %}...{% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Job Description Preview</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="text-preview">
-                                                {{ result.job_description[:500] }}{% if result.job_description|length > 500 %}...{% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        {% else %}
-                            <div class="alert alert-danger">
-                                <strong>Error:</strong> {{ result.message }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+<!-- Navigation -->
+<nav class="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="/" class="text-xl font-bold text-gray-900">Resume Tailor</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-gray-600 hover:text-gray-900">Home</a>
+                <a href="/generate" class="text-gray-600 hover:text-gray-900">Generate</a>
+                <a href="/profile" class="text-gray-600 hover:text-gray-900">Profile</a>
             </div>
         </div>
     </div>
+</nav>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Add top padding to account for fixed navigation -->
+<div class="pt-16">
+
+    <div class="container mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-4">Result</h1>
+        
+        {% if job_description and resume_text %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Job Description Card -->
+            <div class="card bg-white rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-2">Job Description</h2>
+                <div class="text-preview">{{ job_description }}</div>
+            </div>
+            
+            <!-- Resume Card -->
+            <div class="card bg-white rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-2">Your Resume</h2>
+                <div class="text-preview">{{ resume_text }}</div>
+            </div>
+        </div>
+
+        <!-- Match Analysis -->
+        <div class="card bg-white rounded-lg p-6 mt-8">
+            <h2 class="text-xl font-semibold mb-4">Match Analysis</h2>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="match-percentage">{{ match_percentage }}%</div>
+                    <p class="text-gray-600">Overall Match</p>
+                </div>
+                <div>
+                    <!-- You can add a visual representation of the match here, like a progress bar -->
+                </div>
+            </div>
+
+            <!-- Keyword Analysis -->
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Keyword Match</h3>
+                {% if matched_keywords %}
+                    {% for keyword in matched_keywords %}
+                        <span class="inline-block bg-green-200 text-green-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 keyword-badge">{{ keyword }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p>No keywords matched.</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Missing Keywords</h3>
+                {% if missing_keywords %}
+                    {% for keyword in missing_keywords %}
+                        <span class="inline-block bg-red-200 text-red-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 keyword-badge">{{ keyword }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p>No keywords missing.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+            <p>Please upload both a job description and a resume to see the results.</p>
+        {% endif %}
+    </div>
+
+</div>
+
 </body>
 </html>

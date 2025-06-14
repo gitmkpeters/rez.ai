@@ -15,6 +15,7 @@ def main():
     print("🔧 Mode: Development")
     print("🛡️  SSL: Disabled")
     print("📁 Output: ./output/ and ./app/output/")
+    print("👤 Profile: /profile for user data management")
     print("=" * 50)
     
     # Set environment variables to force HTTP
@@ -23,6 +24,15 @@ def main():
     
     # Create the Flask app
     app = create_app()
+    
+    # Register the profile blueprint if not already registered
+    try:
+        from app.routes.profile import profile_bp
+        if not any(bp.name == 'profile' for bp in app.blueprints.values()):
+            app.register_blueprint(profile_bp)
+            print("✅ Profile blueprint registered")
+    except ImportError as e:
+        print(f"⚠️  Could not import profile blueprint: {e}")
     
     # Configure for HTTP development
     app.config.update(

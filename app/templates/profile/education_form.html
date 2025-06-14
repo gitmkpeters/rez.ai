@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if education %}Edit Education{% else %}Add Education{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                {% if education %}Edit Education{% else %}Add Education{% endif %}
+            </h1>
+            <a href="{{ url_for('profile.profile_home', user_id=user_id) }}" 
+               class="text-gray-600 hover:text-gray-800">
+                ← Back to Profile
+            </a>
+        </div>
+
+        <!-- Education Form -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <form method="POST">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                
+                <div class="space-y-6">
+                    <!-- Institution -->
+                    <div>
+                        <label for="institution" class="block text-sm font-medium text-gray-700 mb-1">
+                            Institution *
+                        </label>
+                        <input type="text" id="institution" name="institution" required
+                               value="{{ education.institution if education else '' }}"
+                               placeholder="University or School Name"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Degree -->
+                    <div>
+                        <label for="degree" class="block text-sm font-medium text-gray-700 mb-1">
+                            Degree *
+                        </label>
+                        <input type="text" id="degree" name="degree" required
+                               value="{{ education.degree if education else '' }}"
+                               placeholder="Bachelor's, Master's, PhD, Certificate, etc."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Field of Study -->
+                    <div>
+                        <label for="field_of_study" class="block text-sm font-medium text-gray-700 mb-1">
+                            Field of Study
+                        </label>
+                        <input type="text" id="field_of_study" name="field_of_study"
+                               value="{{ education.field_of_study if education else '' }}"
+                               placeholder="Computer Science, Business Administration, etc."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">
+                                Start Date
+                            </label>
+                            <input type="month" id="start_date" name="start_date"
+                                   value="{{ education.start_date if education else '' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">
+                                End Date
+                            </label>
+                            <input type="month" id="end_date" name="end_date"
+                                   value="{{ education.end_date if education else '' }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Currently Studying -->
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="is_current" 
+                                   {% if education and education.is_current %}checked{% endif %}
+                                   class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <span class="ml-2 text-sm text-gray-700">I am currently studying here</span>
+                        </label>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                        </label>
+                        <textarea id="description" name="description" rows="3"
+                                  placeholder="Additional details about your education, honors, relevant coursework, etc."
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ education.description if education else '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end space-x-4 mt-8">
+                    <a href="{{ url_for('profile.profile_home', user_id=user_id) }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        {% if education %}Update Education{% else %}Add Education{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-clear end date when "currently studying" is checked
+document.querySelector('input[name="is_current"]').addEventListener('change', function() {
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    if (this.checked) {
+        endDateInput.value = '';
+        endDateInput.disabled = true;
+    } else {
+        endDateInput.disabled = false;
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const isCurrentCheckbox = document.querySelector('input[name="is_current"]');
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    if (isCurrentCheckbox.checked) {
+        endDateInput.disabled = true;
+    }
+});
+</script>
+{% endblock %}
