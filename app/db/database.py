@@ -1,34 +1,26 @@
 """
 Database Connection Manager
 
-This module handles SQLite database connections and initialization.
+This module handles SQLite database connections and initialization with proper threading support.
 """
 
 import os
 import sqlite3
 import logging
+import threading
 from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 class Database:
-    """SQLite database connection manager"""
-    
-    _instance = None
-    
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Database, cls).__new__(cls)
-            cls._instance.connection = None
-            cls._instance.initialized = False
-        return cls._instance
+    """SQLite database connection manager with thread-safe connections"""
     
     def __init__(self):
-        if not self.initialized:
-            self.db_path = os.path.join(os.getcwd(), 'app', 'data', 'resume_tailor.db')
-            self.ensure_db_directory()
-            self.initialized = True
+        self.db_path = os.path.join(os.getcwd(), 'app', 'data', 'resume_tailor.db')
+        self.ensure_db_directory()
+        # Use thread-local storage for connections
+        self._local = threading.local()
     
     def ensure_db_directory(self):
         """Ensure the database directory exists"""
@@ -37,22 +29,31 @@ class Database:
         logger.info(f"Database directory ensured: {db_dir}")
     
     def get_connection(self) -> sqlite3.Connection:
-        """Get a database connection, creating one if needed"""
-        if self.connection is None:
+        """Get a thread-safe database connection"""
+        if not hasattr(self._local, 'connection') or self._local.connection is None:
             try:
-                self.connection = sqlite3.connect(self.db_path)
-                self.connection.row_factory = sqlite3.Row
+                self._local.connection = sqlite3.connect(
+                    self.db_path,
+                    check_same_thread=False,  # Allow connection sharing
+                    timeout=30.0  # 30 second timeout
+                )
+                self._local.connection.row_factory = sqlite3.Row
+                # Enable WAL mode for better concurrency
+                self._local.connection.execute('PRAGMA journal_mode=WAL')
+                self._local.connection.execute('PRAGMA synchronous=NORMAL')
+                self._local.connection.execute('PRAGMA cache_size=1000')
+                self._local.connection.execute('PRAGMA temp_store=memory')
                 logger.info(f"Connected to database: {self.db_path}")
             except sqlite3.Error as e:
                 logger.error(f"Database connection error: {str(e)}")
                 raise
-        return self.connection
+        return self._local.connection
     
     def close(self):
-        """Close the database connection"""
-        if self.connection:
-            self.connection.close()
-            self.connection = None
+        """Close the thread-local database connection"""
+        if hasattr(self._local, 'connection') and self._local.connection:
+            self._local.connection.close()
+            self._local.connection = None
             logger.info("Database connection closed")
     
     def execute_script(self, script: str) -> bool:
